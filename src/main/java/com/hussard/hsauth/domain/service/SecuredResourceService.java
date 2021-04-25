@@ -4,11 +4,13 @@ import com.hussard.hsauth.domain.entity.Authority;
 import com.hussard.hsauth.domain.entity.SecuredResource;
 import com.hussard.hsauth.domain.repository.SecuredResourceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -24,12 +26,19 @@ public class SecuredResourceService {
 
         List<SecuredResource> securedResources = securedResourceRepository.findAll();
 
-        for(SecuredResource securedResource : securedResources){
+        for (SecuredResource securedResource : securedResources) {
             List<ConfigAttribute> configs = new LinkedList<>();
-            for(Authority authority : securedResource.getAuthorities()){
+            for (Authority authority : securedResource.getAuthorities()) {
                 configs.add(new SecurityConfig(authority.getAuthority()));
             }
-            resultMap.put(new AntPathRequestMatcher(securedResource.getPattern()), configs);
+
+            if (CollectionUtils.isEmpty(securedResource.getHttpMethods())) {
+                resultMap.put(new AntPathRequestMatcher(securedResource.getPattern()), configs);
+            } else {
+                for (HttpMethod httpMethod : securedResource.getHttpMethods()) {
+                    resultMap.put(new AntPathRequestMatcher(securedResource.getPattern(), httpMethod.name()), configs);
+                }
+            }
         }
 
         return resultMap;
