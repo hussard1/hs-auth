@@ -2,23 +2,29 @@ package com.hussard.hsauth.config;
 
 import com.hussard.hsauth.config.jwt.JwtAuthenticationFilter;
 import com.hussard.hsauth.config.jwt.JwtTokenProvider;
-import com.hussard.hsauth.domain.enums.UserRole;
+import com.hussard.hsauth.domain.enums.AuthorityType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.vote.AffirmativeBased;
+import org.springframework.security.access.vote.RoleVoter;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.servlet.Filter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -26,10 +32,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomFilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource;
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers();
+    }
+
+    @Override
+    public AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     @Override
@@ -40,17 +52,34 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/auth/**").permitAll()
-                .antMatchers("/test/normal").hasRole(UserRole.NORMAL.name())
-                .antMatchers("/test/super").hasRole(UserRole.SUPER.name())
                 .anyRequest().authenticated()
-//                .and()
-//                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .and()
+//                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(filterSecurityInterceptor(), FilterSecurityInterceptor.class)
                 .cors();
 //        http.addFilterAfter(new CustomFilter(), BasicAuthenticationFilter.class);
+    }
+
+    private Filter filterSecurityInterceptor() throws Exception {
+        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+        filterSecurityInterceptor.setAuthenticationManager(authenticationManager());
+        filterSecurityInterceptor.setSecurityMetadataSource(customFilterInvocationSecurityMetadataSource);
+        filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
+        return filterSecurityInterceptor;
+    }
+
+    @Bean
+    public AffirmativeBased affirmativeBased() {
+        RoleVoter voter = new CustomRoleVoter();
+        voter.setRolePrefix("");
+        List<AccessDecisionVoter<? extends Object>> voters = new ArrayList<>();
+        voters.add(voter);
+        AffirmativeBased affirmativeBased = new AffirmativeBased(voters);
+        affirmativeBased.setAllowIfAllAbstainDecisions(false);
+        return affirmativeBased;
     }
 
 //    @Bean

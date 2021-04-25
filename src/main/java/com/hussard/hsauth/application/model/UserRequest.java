@@ -1,6 +1,8 @@
 package com.hussard.hsauth.application.model;
 
+import com.hussard.hsauth.domain.entity.Authority;
 import com.hussard.hsauth.domain.entity.User;
+import com.hussard.hsauth.domain.enums.AuthorityType;
 import lombok.Getter;
 import lombok.ToString;
 

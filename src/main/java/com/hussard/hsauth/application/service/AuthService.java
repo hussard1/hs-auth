@@ -3,16 +3,14 @@ package com.hussard.hsauth.application.service;
 import com.hussard.hsauth.application.exception.DuplicateUserNameException;
 import com.hussard.hsauth.application.exception.InvalidPasswordException;
 import com.hussard.hsauth.application.model.AuthResponse;
-import com.hussard.hsauth.application.model.CommonResponse;
 import com.hussard.hsauth.application.model.UserRequest;
-import com.hussard.hsauth.application.model.UserResponse;
 import com.hussard.hsauth.config.jwt.JwtTokenProvider;
+import com.hussard.hsauth.domain.entity.Authority;
 import com.hussard.hsauth.domain.entity.User;
-import com.hussard.hsauth.domain.enums.UserRole;
+import com.hussard.hsauth.domain.enums.AuthorityType;
+import com.hussard.hsauth.domain.service.AuthorityDomainService;
 import com.hussard.hsauth.domain.service.UserDomainService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,7 +24,9 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final UserDomainService userDomainService;
+    private final AuthorityDomainService authorityDomainService;
 
+    @Transactional
     public AuthResponse signin(UserRequest userRequest) {
         User user = userDomainService.findByUsername(userRequest.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("유저 이름이 존재하지 않습니다."));
@@ -47,7 +47,7 @@ public class AuthService {
         }
         User user = userDomainService.save(userRequest.toEntity());
         user.updatePassword(passwordEncoder.encode(user.getPassword()));
-        user.addRole(UserRole.NORMAL);
+        user.addAuthority(authorityDomainService.get(AuthorityType.NORMAL));
 
         String token = jwtTokenProvider.createToken(user);
 

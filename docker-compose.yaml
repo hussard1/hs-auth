@@ -3,17 +3,28 @@ services: # 이 항목 밑에 실행하려는 컨테이너 들을 정의 ( 컴�
   db: # 서비스 명
     image: mysql:5.7 # 사용할 이미지
     restart: always
-    container_name: mysql-hsframework # 컨테이너 이름 설정
+    container_name: mysql-hs # 컨테이너 이름 설정
     ports:
       - "3306:3306" # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
     environment: # -e 옵션
-      - MYSQL_DATABASE=hsframework
+      - MYSQL_DATABASE=hs
       - MYSQL_ROOT_PASSWORD=1234  # MYSQL 패스워드 설정 옵션
     command: # 명령어 실행
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - /Users/hussard01/data/mysql-hsframework:/var/lib/mysql # -v 옵션 (다렉토리 마운트 설정)
+  redis :
+    image: redis:alpine
+    command: redis-server --port 6379
+    container_name: redis-hs
+    hostname: redis-hs
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    ports:
+      - 6379:6379
+
 
 #docker exec -i -t mysql_test bash
 #mysql -u root -p
