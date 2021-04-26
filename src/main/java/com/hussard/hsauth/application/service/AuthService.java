@@ -4,8 +4,7 @@ import com.hussard.hsauth.application.exception.DuplicateUserNameException;
 import com.hussard.hsauth.application.exception.InvalidPasswordException;
 import com.hussard.hsauth.application.model.AuthResponse;
 import com.hussard.hsauth.application.model.UserRequest;
-import com.hussard.hsauth.config.jwt.JwtTokenProvider;
-import com.hussard.hsauth.domain.entity.Authority;
+import com.hussard.hsauth.config.security.jwt.JwtTokenProvider;
 import com.hussard.hsauth.domain.entity.User;
 import com.hussard.hsauth.domain.enums.AuthorityType;
 import com.hussard.hsauth.domain.service.AuthorityDomainService;
@@ -32,7 +31,7 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("유저 이름이 존재하지 않습니다."));
 
         if (!passwordEncoder.matches(userRequest.getPassword(), user.getPassword()))
-            throw new InvalidPasswordException();
+            throw new InvalidPasswordException("비밀번호가 잘못되었습니다.");
 
         String token = jwtTokenProvider.createToken(user);
 

@@ -1,4 +1,4 @@
-package com.hussard.hsauth.config;
+package com.hussard.hsauth.config.security;
 
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.vote.RoleVoter;

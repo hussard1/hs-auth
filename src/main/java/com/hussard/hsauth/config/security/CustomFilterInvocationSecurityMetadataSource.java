@@ -1,4 +1,4 @@
-package com.hussard.hsauth.config;
+package com.hussard.hsauth.config.security;
 
 import com.hussard.hsauth.domain.service.SecuredResourceService;
 import lombok.extern.slf4j.Slf4j;

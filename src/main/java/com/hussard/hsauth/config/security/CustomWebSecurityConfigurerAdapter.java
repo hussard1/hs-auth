@@ -1,8 +1,7 @@
-package com.hussard.hsauth.config;
+package com.hussard.hsauth.config.security;
 
-import com.hussard.hsauth.config.jwt.JwtAuthenticationFilter;
-import com.hussard.hsauth.config.jwt.JwtTokenProvider;
-import com.hussard.hsauth.domain.enums.AuthorityType;
+import com.hussard.hsauth.config.security.jwt.JwtAuthenticationFilter;
+import com.hussard.hsauth.config.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

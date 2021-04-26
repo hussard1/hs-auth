@@ -1,6 +1,5 @@
 package com.hussard.hsauth.application.controller;
 
-import com.hussard.hsauth.application.model.CommonResponse;
 import com.hussard.hsauth.application.model.ProductRequest;
 import com.hussard.hsauth.application.model.ProductResponse;
 import com.hussard.hsauth.application.service.ProductService;
@@ -18,16 +17,16 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public CommonResponse<Page<ProductResponse>> list(
+    public Page<ProductResponse> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int pageSize
     ) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return CommonResponse.of(productService.list(pageable));
+        return productService.list(pageable);
     }
 
     @PostMapping
-    public CommonResponse<ProductResponse> save(@RequestBody ProductRequest productRequest) {
-        return CommonResponse.of(productService.save(productRequest));
+    public ProductResponse save(@RequestBody ProductRequest productRequest) {
+        return productService.save(productRequest);
     }
 }

@@ -1,4 +1,4 @@
-package com.hussard.hsauth.config.jwt;
+package com.hussard.hsauth.config.security.jwt;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

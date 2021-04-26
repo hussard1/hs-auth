@@ -1,4 +1,4 @@
-package com.hussard.hsauth.config.jwt;
+package com.hussard.hsauth.config.security.jwt;
 
 import com.hussard.hsauth.domain.entity.User;
 import com.hussard.hsauth.domain.enums.AuthorityType;
@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
