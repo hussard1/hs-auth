@@ -57,12 +57,10 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(filterSecurityInterceptor(), FilterSecurityInterceptor.class)
                 .cors();
-//        http.addFilterAfter(new CustomFilter(), BasicAuthenticationFilter.class);
     }
 
-    private Filter filterSecurityInterceptor() throws Exception {
+    private Filter filterSecurityInterceptor() {
         FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
-        filterSecurityInterceptor.setAuthenticationManager(authenticationManager());
         filterSecurityInterceptor.setSecurityMetadataSource(customFilterInvocationSecurityMetadataSource);
         filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
         return filterSecurityInterceptor;
@@ -72,7 +70,7 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
     public AffirmativeBased affirmativeBased() {
         RoleVoter voter = new CustomRoleVoter();
         voter.setRolePrefix("");
-        List<AccessDecisionVoter<? extends Object>> voters = new ArrayList<>();
+        List<AccessDecisionVoter<?>> voters = new ArrayList<>();
         voters.add(voter);
         AffirmativeBased affirmativeBased = new AffirmativeBased(voters);
         affirmativeBased.setAllowIfAllAbstainDecisions(false);

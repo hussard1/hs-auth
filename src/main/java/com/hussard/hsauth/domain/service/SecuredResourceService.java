@@ -4,6 +4,7 @@ import com.hussard.hsauth.domain.entity.Authority;
 import com.hussard.hsauth.domain.entity.SecuredResource;
 import com.hussard.hsauth.domain.repository.SecuredResourceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
